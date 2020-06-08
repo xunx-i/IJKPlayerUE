@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--LogicCore additions-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- 初始化-->
+  <init>
+    <log text="IJKPlayerUE init"/>
+	<setBoolFromProperty result="bGradle" ini="Engine" section="/Script/AndroidRuntimeSettings.AndroidRuntimeSettings" property="bEnableGradle" default="false"/>
+  </init>
+
+  <!--在ndk-build编译之前，从Intermediate/Android/APK中拷贝或删除文件-->
+  <prebuildCopies>
+   
+	<copyDir src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary"
+					dst="$S(BuildDir)/JavaLibs/IJKPlayerUELibrary" />
+    <!--copyDir src="$S(PluginDir)/../ThirdParty/GCloudSDKLibrary/Android/" dst="$S(BuildDir)"/>
+    <copyDir src="$S(PluginDir)/../../Build/Android/" dst="$S(BuildDir)"/ -->
+  </prebuildCopies>
+
+
+  <!-- optional updates applied to AndroidManifest.xml -->
+  <androidManifestUpdates>
+    <loopElements tag="application">
+      <setElement result="activityInfo" value="activity"/>
+      <addAttribute tag="$activityInfo" name="android:name" value="cc.xunx.VideoActivity" />
+      <addAttribute tag="$activityInfo" name="android:screenOrientation" value="landscape" />
+      <addAttribute tag="$activityInfo" name="android:configChanges" value="mcc|mnc|uiMode|density|screenSize|orientation|keyboardHidden|keyboard" />
+      <addElement tag="$" name="activityInfo"/>
+    </loopElements>
+	
+  </androidManifestUpdates>
+  
+	<!--拷贝文件或目录到Intermediate/Android/APK -->
+  <resourceCopies>
+    
+    
+  </resourceCopies>
+
+	<!-- GameActivity.java中导入类 -->
+	<gameActivityImportAdditions>
+    <insert>
+      import android.widget.Toast;
+      import java.io.IOException;
+      import android.util.Log;
+      import cc.xunx.VideoActivity;
+    </insert>
+	</gameActivityImportAdditions>
+
+  <!--GameActivity.java导完类之后要做的事情 -->
+  <gameActivityPostImportAdditions>
+  </gameActivityPostImportAdditions>
+
+  <!-- GameActivity.java类中添加代码 -->
+  <gameActivityClassAdditions>
+    <insert>
+
+      public class ToastRunnable implements Runnable
+      {
+      private String msg;
+      public ToastRunnable(String msg)
+      {
+      this.msg = msg;
+      }
+      public void run()
+      {
+      Toast.makeText(_activity.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+      }
+      }
+
+      public void AndroidThunkJava_PlayMovie(String msg)
+      {
+      try
+      {
+
+     
+      Bundle bundle = new Bundle();
+      bundle.putSerializable("Json",msg);
+      Intent intent = new Intent(GameActivity.this, VideoActivity.class);
+      intent.putExtras(bundle);
+      startActivity(intent);
+      }
+      catch (Exception e)
+      {
+      Log.debug("Toast failed with exception " + e.getMessage());
+      }
+      }
+    </insert>
+  </gameActivityClassAdditions>
+
+  
+  <!--GameActivity.java onCreate添加代码 -->
+  <gameActivityOnCreateAdditions>
+    <insert>
+
+
+      //Toast.makeText(getApplicationContext(),"IJKPlayerUE Toast Test ",Toast.LENGTH_LONG).show();
+
+    </insert>
+  </gameActivityOnCreateAdditions>
+
+  <!--GameActivity.java onDestroy添加代码-->
+  <gameActivityOnDestroyAdditions>
+  </gameActivityOnDestroyAdditions>
+  
+  <!--GameActivity.java onStart添加代码-->
+  <gameActivityOnStartAdditions>
+  </gameActivityOnStartAdditions>
+  
+  <!--GameActivity.java OnRestart添加代码-->
+  <gameActivityOnRestartAdditions>
+  </gameActivityOnRestartAdditions>
+  
+  <!--GameActivity.java onStop添加代码-->
+  <gameActivityOnStopAdditions>
+  </gameActivityOnStopAdditions>
+  
+  <!--GameActivity.java onPause添加代码-->
+  <gameActivityOnPauseAdditions>
+    <insert> 
+
+    </insert>
+  </gameActivityOnPauseAdditions>
+  
+  <!--GameActivity.java onResume添加代码-->
+  <gameActivityOnResumeAdditions>
+     <insert> 
+
+     </insert>
+  </gameActivityOnResumeAdditions>
+  
+  <!-- GameActivity.java onActivityResult添加代码 -->
+  <gameActivityOnActivityResultAdditions>
+  </gameActivityOnActivityResultAdditions>
+  
+  <!--GameActivity.java OnNewIntent添加代码-->
+  <gameActivityOnNewIntentAdditions>
+  
+  </gameActivityOnNewIntentAdditions>
+
+	<!--在libUE4.so库加载之前需要加载的库-->
+	<soLoadLibrary>
+    
+	
+	</soLoadLibrary>
+
+  <proguardAdditions>
+
+    <insert>
+    
+      -keepclasseswithmembers class * {
+      ... *JNI*(...);
+      }
+
+      -keepclasseswithmembernames class * {
+      ... *JRI*(...);
+      }
+
+      -keep class **JNI* {*;}
+      -keep class android.app.** {
+      *;
+      }
+    </insert>
+  </proguardAdditions>
+
+  <buildGradleAdditions>
+  </buildGradleAdditions>
+</root>
