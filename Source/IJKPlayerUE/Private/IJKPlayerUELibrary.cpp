@@ -11,13 +11,15 @@
 	#endif
 #endif
 
+FMakeURLTaskCompleted TaskCompleted;
+
 void UIJKPlayerUELibrary::PlayMovieForAndroid(const FString& url)
 {
-#if PLATFORM_ANDROID && USE_ANDROID_JNI
 	if (url.Len() == 0)
 	{
 		return;
 	}
+#if PLATFORM_ANDROID && USE_ANDROID_JNI
 	JNIEnv* Env = FAndroidApplication::GetJavaEnv();
 	if (Env)
 	{
@@ -29,23 +31,37 @@ void UIJKPlayerUELibrary::PlayMovieForAndroid(const FString& url)
 #endif
 }
 
-FString UIJKPlayerUELibrary::MakeMovieURL(const FString& Title, const TArray<FMovieURL>& URLArray)
+void UIJKPlayerUELibrary::MakeMovieURL(const FMakeURLTaskCompleted& CompletedEvent, const FString& Title, const TMap<FString,FString>& UrlMap)
+{
+	TaskCompleted = CompletedEvent;
+	MakeURLTask* task = new MakeURLTask(Title, UrlMap);
+	task->StartBackgroundTask();
+}
+
+void UIJKPlayerUELibrary::OnCompleted(const FString& url)
+{
+	TaskCompleted.ExecuteIfBound(url);
+}
+
+void FMakeURLTask::DoWork()
 {
 	TSharedPtr<FJsonObject> url_object = MakeShareable(new FJsonObject);
 	url_object->SetStringField("Title", Title);
 	TArray<TSharedPtr<FJsonValue>> urlArray;
 
-	for (int i = 0; i < URLArray.Num(); i++)
+	for (auto it :URLMap)
 	{
 		TSharedPtr<FJsonObject> url = MakeShareable(new FJsonObject);
-		url->SetStringField("name", URLArray[i].Name);
-		url->SetStringField("url", URLArray[i].URL);
+		url->SetStringField("name", *it.Key);
+		url->SetStringField("url", *it.Value);
 		urlArray.Add(MakeShareable(new FJsonValueObject(url)));
 	}
+	
 	url_object->SetArrayField("array", urlArray);
 	FString strGet;
 	TSharedRef<TJsonWriter<TCHAR>> Writer = TJsonWriterFactory<>::Create(&strGet);
 	FJsonSerializer::Serialize(url_object.ToSharedRef(), Writer);
 	Writer->Close();
-	return strGet;
+
+	UIJKPlayerUELibrary::OnCompleted(strGet);
 }

@@ -3,29 +3,50 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Async/AsyncWork.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "IJKPlayerUELibrary.generated.h"
 
-USTRUCT(BlueprintType)
-struct FMovieURL
+
+
+class FMakeURLTask : public FNonAbandonableTask
 {
-	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, Category = AndroidFunctionLibrary)
-		FString Name;
-	UPROPERTY(BlueprintReadWrite, Category = AndroidFunctionLibrary)
-		FString URL;
+
+	friend class FAsyncTask<FMakeURLTask>;
+
+	FMakeURLTask(const FString& title, const TMap<FString,FString>& urlMap)
+		: Title(title),
+		URLMap(urlMap)
+	{
+	}
+	void DoWork();
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FMakeURLTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+
+private:
+	FString Title;
+	TMap<FString,FString> URLMap;
 };
+typedef FAutoDeleteAsyncTask<FMakeURLTask> MakeURLTask;
+
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMakeURLTaskCompleted, const FString&, URL);
 
 UCLASS()
 class IJKPLAYERUE_API UIJKPlayerUELibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+
 	UFUNCTION(BlueprintCallable, Category = "IJKPlayerUELibrary")
 		static void PlayMovieForAndroid(const FString& url);
 
 	UFUNCTION(BlueprintCallable, Category = "IJKPlayerUELibrary")
-		static FString MakeMovieURL(const FString& Title, const TArray<FMovieURL>& URLArray);
-	
+		static void MakeMovieURL(const FMakeURLTaskCompleted& CompletedEvent, const FString& Title, const TMap<FString,FString>& UrlMap);
+
+	static void OnCompleted(const FString& url);
 };

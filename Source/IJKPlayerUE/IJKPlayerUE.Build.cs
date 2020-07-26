@@ -12,12 +12,12 @@ public class IJKPlayerUE : ModuleRules
         string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
         PublicIncludePaths.AddRange(
 			new string[] {
-                "Runtime/Launch/Public",
-                Path.Combine(PluginPath, "Public")
-            }
+				//"IJKPlayerUE/Public",
+				Path.GetFullPath(Path.Combine(ModuleDirectory,"Public"))
+			}
 			);
-				
 		
+
 		PrivateIncludePaths.AddRange(
 			new string[] {
                 "IJKPlayerUE/Private",
@@ -55,10 +55,20 @@ public class IJKPlayerUE : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
         if (Target.Platform == UnrealTargetPlatform.Android)
         {
+			PrivateDependencyModuleNames.AddRange(new string[] { "Launch" });
 
-            AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(PluginPath, "IJKPlayerUE_APL.xml"));
+            string ArchDir = "armeabi-v7a";
+
+			string LibDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../ThirdParty/IJKPlayerUELibrary/IJKPlayerLib/Android"));
+
+			string LibPath = Path.Combine(LibDir, ArchDir);
+            System.Console.WriteLine("--------------Android LibPath = " + LibPath);
+			PublicSystemLibraryPaths.Add(LibPath);
+
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(PluginPath, "IJKPlayerUE_APL.xml"));
         }
-    }
+	}
 }

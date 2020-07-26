@@ -427,7 +427,7 @@ public class PlayerView {
                 updatePausePlay();
             } else if (v.getId() == R.id.app_video_finish) {
                 /**返回*/
-                if (!isOnlyFullScreen && !isPortrait) {
+               /* if (!isOnlyFullScreen && !isPortrait) {
                     mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 } else {
                     if (mPlayerBack != null) {
@@ -435,6 +435,11 @@ public class PlayerView {
                     } else {
                         mActivity.finish();
                     }
+                }*/
+                if (mPlayerBack != null) {
+                    mPlayerBack.onPlayerBack();
+                } else {
+                    mActivity.finish();
                 }
             } else if (v.getId() == R.id.app_video_netTie_icon) {
                 /**使用移动网络提示继续播放*/
@@ -1058,11 +1063,22 @@ public class PlayerView {
             tv_steam.setText("播放列表");
             currentUrl = listVideos.get(index).getUrl();
             listVideos.get(index).setSelect(true);
-            isLive();
+
+            
             if (videoView.isPlaying()) {
-                getCurrentPosition();
+                if(isLive())
+                {
+                    currentPosition = -1;
+                    videoView.setRender(videoView.RENDER_TEXTURE_VIEW);
+                    videoView.setVideoPath(currentUrl);
+                    videoView.seekTo(0);
+                }else{
+                    currentPosition = 0;
+                }
                 videoView.release(false);
             }
+
+
             isHasSwitchStream = true;
         }
         return this;
@@ -1179,8 +1195,9 @@ public class PlayerView {
     public boolean isLive() {
         if (currentUrl != null
                 && (currentUrl.startsWith("rtmp://")
+				|| (currentUrl.startsWith("rtsp://")
                 || (currentUrl.startsWith("http://") && currentUrl.endsWith(".m3u8"))
-                || (currentUrl.startsWith("http://") && currentUrl.endsWith(".flv")))) {
+                || (currentUrl.startsWith("http://") && currentUrl.endsWith(".flv"))))) {
             isLive = true;
         } else {
             isLive = false;

@@ -11,14 +11,31 @@
   <!--在ndk-build编译之前，从Intermediate/Android/APK中拷贝或删除文件-->
   <prebuildCopies>
    
-	<copyDir src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary"
+	<copyDir src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary/Android"
 					dst="$S(BuildDir)/JavaLibs/IJKPlayerUELibrary" />
+
+   
     <!--copyDir src="$S(PluginDir)/../ThirdParty/GCloudSDKLibrary/Android/" dst="$S(BuildDir)"/>
     <copyDir src="$S(PluginDir)/../../Build/Android/" dst="$S(BuildDir)"/ -->
   </prebuildCopies>
 
+  <resourceCopies>
+    
+    <log text="Copying libijkffmpeg.so"/>
+    <copyFile src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary/IJKPlayerLib/Android/armeabi-v7a/libijkffmpeg.so" 
+              dst="$S(BuildDir)/libs/armeabi-v7a/libijkffmpeg.so"/>
 
-  <!-- optional updates applied to AndroidManifest.xml -->
+    <log text="Copying libijkplayer.so"/>
+    <copyFile src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary/IJKPlayerLib/Android/armeabi-v7a/libijkplayer.so" 
+              dst="$S(BuildDir)/libs/armeabi-v7a/libijkplayer.so"/>
+
+    <log text="Copying libijksdl.so"/>
+    <copyFile src="$S(PluginDir)/../ThirdParty/IJKPlayerUELibrary/IJKPlayerLib/Android/armeabi-v7a/libijksdl.so" 
+              dst="$S(BuildDir)/libs/armeabi-v7a/libijksdl.so"/>
+  </resourceCopies>
+
+
+    <!-- optional updates applied to AndroidManifest.xml -->
   <androidManifestUpdates>
     <loopElements tag="application">
       <setElement result="activityInfo" value="activity"/>
@@ -53,20 +70,6 @@
   <!-- GameActivity.java类中添加代码 -->
   <gameActivityClassAdditions>
     <insert>
-
-      public class ToastRunnable implements Runnable
-      {
-      private String msg;
-      public ToastRunnable(String msg)
-      {
-      this.msg = msg;
-      }
-      public void run()
-      {
-      Toast.makeText(_activity.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-      }
-      }
-
       public void AndroidThunkJava_PlayMovie(String msg)
       {
       try
@@ -91,9 +94,6 @@
   <!--GameActivity.java onCreate添加代码 -->
   <gameActivityOnCreateAdditions>
     <insert>
-
-
-      //Toast.makeText(getApplicationContext(),"IJKPlayerUE Toast Test ",Toast.LENGTH_LONG).show();
 
     </insert>
   </gameActivityOnCreateAdditions>
@@ -159,6 +159,9 @@
       -keep class android.app.** {
       *;
       }
+	  -keep com.dou361.ijkplayer.** {
+		*;
+		}
     </insert>
   </proguardAdditions>
 
