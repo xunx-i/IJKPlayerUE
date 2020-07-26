@@ -5,12 +5,7 @@
 # Introduction
 1. 如果需要支持各种直播流的解析播放，自行下载 ijkplayer 编译成库。
 2. UI 引用于 jjdxm_ijkplayer 项目，仅作了一点修改并且将ijkplayer更新到了最新的0.8.8。
-2020-7-15
-
-	1，修复了更换播放源播放位置异常的BUG。
-	2，添加了RTSP和RTMP视频流的支持
-	3，修改了解析JSON的方式，使用异步解析
-	4，使用本地库
+3. 使用本地库,支持RTMP
 
 # link
 jjdxm_ijkplayer: https://github.com/lingcimi/jjdxm_ijkplayer 
