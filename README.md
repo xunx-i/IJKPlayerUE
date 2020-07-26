@@ -12,10 +12,6 @@
 	3，修改了解析JSON的方式，使用异步解析
 	4，使用本地库
 
-2020-7-2
-
-	1，现在退出按钮可以直接关闭播放器了。
-
 # link
 jjdxm_ijkplayer: https://github.com/lingcimi/jjdxm_ijkplayer 
 ijkplayer：https://github.com/Bilibili/ijkplayer
